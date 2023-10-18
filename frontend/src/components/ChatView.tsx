@@ -58,7 +58,7 @@ const ChatView = () => {
     messages.length > 0 && (
       <>
         {messages.map((message, index) => (
-          <ChatBubble message={message} index={index} />
+          <ChatBubble message={message} key={index} />
         ))}
         <AlwaysScrollToBottom />
       </>

@@ -2,10 +2,9 @@ import { ChatMessage } from "../models/ChatModels";
 
 interface ChatBubbleProps {
   message: ChatMessage;
-  index: number;
 }
 
-const ChatBubble = ({ message, index }: ChatBubbleProps) => {
+const ChatBubble = ({ message }: ChatBubbleProps) => {
   const bubbleStyle = (sender: ChatMessage["sender"]) => {
     return sender === "bot"
       ? "chat-bubble chat-bubble-neutral whitespace-pre-wrap"
@@ -20,9 +19,7 @@ const ChatBubble = ({ message, index }: ChatBubbleProps) => {
       className={message.sender === "bot" ? "chat chat-start" : "chat chat-end"}
     >
       <div className="chat-footer">{message.sender}</div>
-      <div className={bubbleStyle(message.sender)} key={index}>
-        {formatedMessage}
-      </div>
+      <div className={bubbleStyle(message.sender)}>{formatedMessage}</div>
     </div>
   );
 };
