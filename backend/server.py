@@ -18,12 +18,11 @@ dotenv_path = os.path.join(os.path.dirname(__file__), '..', '.env')
 dotenv.load_dotenv(dotenv_path)
 apikey = os.getenv('OPEN_AI_API_KEY')
 
-async def stream_response(userInput, websocket: WebSocket):
+async def stream_response(userInput, websocket: WebSocket, memory: ConversationBufferMemory):
     ## You can modify the agent here
     #######################################
     callback_handler = AsyncFinalIteratorCallbackHandler(answer_prefix_tokens=["Final", "Answer", '",', "", '"', "action", "_input", '":', '"',])
     llm = ChatOpenAI(openai_api_key=apikey, temperature=0, streaming=True, callbacks=[callback_handler])
-    memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
     agent = initialize_agent(tools=[], llm=llm, agent=AgentType.CHAT_CONVERSATIONAL_REACT_DESCRIPTION, verbose=True, memory=memory, handle_parsing_errors=True)
     #######################################
     
@@ -57,8 +56,12 @@ async def stream_response(userInput, websocket: WebSocket):
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
+    
+    ## memory needs to be instantiated for each websocket connection before the loop
+    memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
+
     async for userInput in websocket.iter_text():
-        await asyncio.gather(stream_response(userInput, websocket))
+        await asyncio.gather(stream_response(userInput, websocket, memory))
 
 if __name__ == "__main__":
     import uvicorn
